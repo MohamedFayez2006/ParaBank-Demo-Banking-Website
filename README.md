@@ -5,6 +5,9 @@ The **Banking Transaction System** is a planned software project developed as th
 The project aims to simulate basic banking operations, including account management and transaction handling, in a structured and practical manner.
 
 ---
+**WorkSpace In JITA**
+"https://mhmdfayz7twsh.atlassian.net/jira/software/projects/PARABANK/boards/67/backlog?atlOrigin=eyJpIjoiN2I5MGRkZjQ5MzMyNGJkYTlkMzA5NGFiYTE4OGU1NGIiLCJwIjoiaiJ9 "
+---
 
 ## 👥 Team Members
 - **Alaa El Sawy**
