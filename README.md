@@ -9,7 +9,8 @@ The project aims to simulate basic banking operations, including account managem
 
 "https://mhmdfayz7twsh.atlassian.net/jira/software/projects/PARABANK/boards/67/backlog?atlOrigin=eyJpIjoiN2I5MGRkZjQ5MzMyNGJkYTlkMzA5NGFiYTE4OGU1NGIiLCJwIjoiaiJ9 "
 ---
-**WorkSpace In Postman***
+**WorkSpace In Postman**
+
 "https://mhmdfayz7twsh-4951565.postman.co/workspace/ca4cd2c1-007c-4f48-97df-17f4cdafdf5e"
 ---
 ## 👥 Team Members
