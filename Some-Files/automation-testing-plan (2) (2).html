@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خطة اختبار الأتمتة — 5 مجموعات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d1117;
+    --bg-2:#0a0e14;
+    --card:#161b22;
+    --card-border:#242c37;
+    --text:#e6edf3;
+    --muted:#8b949e;
+    --muted-2:#5b6572;
+
+    --g1:#22d3ee; --g2:#34d399; --g3:#fbbf24; --g4:#f472b6; --g5:#a78bfa;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:
+      radial-gradient(circle at 15% 0%, #1a2230 0%, transparent 45%),
+      radial-gradient(circle at 90% 15%, #1a1a2e 0%, transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Cairo', sans-serif;
+    line-height:1.6;
+    min-height:100vh;
+    padding-bottom:80px;
+  }
+
+  .mono{font-family:'IBM Plex Mono', monospace;}
+
+  /* ============ TERMINAL HEADER ============ */
+  .terminal-bar{
+    background:var(--bg-2);
+    border-bottom:1px solid var(--card-border);
+    padding:10px 24px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    direction:ltr;
+  }
+  .dot{width:11px;height:11px;border-radius:50%;}
+  .dot.red{background:#ff5f56;}
+  .dot.yellow{background:#ffbd2e;}
+  .dot.green{background:#27c93f;}
+  .terminal-path{
+    margin-inline-start:16px;
+    font-size:12.5px;
+    color:var(--muted-2);
+  }
+  .terminal-path span{color:#58a6ff;}
+
+  /* ============ HERO ============ */
+  .hero{
+    max-width:1180px;
+    margin:0 auto;
+    padding:64px 24px 40px;
+    text-align:center;
+  }
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.5px;
+    color:#58a6ff;
+    background:#58a6ff14;
+    border:1px solid #58a6ff33;
+    padding:6px 14px;
+    border-radius:100px;
+    margin-bottom:24px;
+  }
+  .eyebrow::before{content:"●";color:#27c93f;font-size:9px;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+  h1{
+    font-size:clamp(30px,5vw,46px);
+    font-weight:800;
+    letter-spacing:-.5px;
+    margin-bottom:14px;
+  }
+  h1 em{
+    font-style:normal;
+    background:linear-gradient(90deg,#58a6ff,#a78bfa 60%,#f472b6);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .hero p{
+    color:var(--muted);
+    font-size:16.5px;
+    max-width:660px;
+    margin:0 auto;
+  }
+  .hero .note{
+    display:inline-block;
+    margin-top:18px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:#f472b6;
+    background:#f472b614;
+    border:1px solid #f472b633;
+    padding:6px 14px;
+    border-radius:100px;
+  }
+
+  .stat-row{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-top:36px;
+  }
+  .stat-chip{
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:14px;
+    padding:14px 26px;
+    min-width:120px;
+  }
+  .stat-chip .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:26px;
+    font-weight:700;
+    color:#fff;
+  }
+  .stat-chip .num .old{
+    font-size:14px;
+    color:var(--muted-2);
+    text-decoration:line-through;
+    margin-inline-end:6px;
+  }
+  .stat-chip .lbl{
+    font-size:12.5px;
+    color:var(--muted);
+    margin-top:2px;
+  }
+
+  /* ============ LAYOUT ============ */
+  .section-wrap{max-width:1180px;margin:0 auto;padding:0 24px;}
+
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin:70px 0 28px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .section-head h2{font-size:23px;font-weight:700;}
+  .section-head .tag{font-family:'IBM Plex Mono', monospace;font-size:12px;color:var(--muted-2);}
+
+  /* ============ GROUP CARDS (stacked, full width, detailed) ============ */
+  .groups{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+  }
+
+  .group-card{
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:16px;
+    padding:26px;
+    position:relative;
+    overflow:hidden;
+    transition:border-color .25s ease;
+  }
+  .group-card::before{
+    content:"";
+    position:absolute;
+    inset-inline-start:0;top:0;bottom:0;
+    width:4px;
+    background:var(--accent);
+  }
+  .group-card:hover{border-color:var(--accent);}
+
+  .group-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .group-head-left{display:flex;align-items:center;gap:14px;}
+  .badge-id{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--accent);
+    background:color-mix(in srgb, var(--accent) 15%, transparent);
+    border:1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    padding:4px 11px;
+    border-radius:100px;
+  }
+  .group-title{font-size:18px;font-weight:700;}
+  .group-count{
+    text-align:left;
+  }
+  .group-count .n{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:30px;
+    font-weight:700;
+    color:#fff;
+    line-height:1;
+  }
+  .group-count .l{font-size:12px;color:var(--muted);}
+
+  .modules{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+  }
+  @media (max-width:760px){.modules{grid-template-columns:1fr;}}
+
+  details.module{
+    background:var(--bg-2);
+    border:1px solid var(--card-border);
+    border-radius:12px;
+    padding:0;
+    overflow:hidden;
+  }
+  details.module > summary{
+    list-style:none;
+    cursor:pointer;
+    padding:13px 16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:14px;
+    font-weight:600;
+    color:#dde3ea;
+  }
+  details.module > summary::-webkit-details-marker{display:none;}
+  details.module > summary::after{
+    content:"＋";
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--muted-2);
+    font-size:14px;
+    transition:transform .2s ease;
+  }
+  details.module[open] > summary::after{content:"－";}
+  details.module > summary .m-count{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--accent);
+    background:color-mix(in srgb, var(--accent) 14%, transparent);
+    padding:2px 9px;
+    border-radius:100px;
+    margin-inline-start:auto;
+    margin-inline-end:10px;
+  }
+  details.module .tc-list{
+    list-style:none;
+    padding:2px 16px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+  }
+  details.module .tc-list li{
+    font-size:13px;
+    color:#aeb6c2;
+    padding-inline-start:22px;
+    position:relative;
+    line-height:1.5;
+  }
+  details.module .tc-list li::before{
+    content:attr(data-i);
+    position:absolute;
+    inset-inline-start:0;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--accent);
+  }
+
+  .owner-tag{
+    margin-top:16px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--muted-2);
+  }
+
+  /* accent binding */
+  .group-card.c1{--accent:var(--g1);} .group-card.c2{--accent:var(--g2);}
+  .group-card.c3{--accent:var(--g3);} .group-card.c4{--accent:var(--g4);}
+  .group-card.c5{--accent:var(--g5);}
+
+  /* ============ ROADMAP ============ */
+  .phases{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:16px;
+  }
+  @media (max-width:1050px){.phases{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.phases{grid-template-columns:1fr;}}
+
+  .phase-card{
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:16px;
+    padding:22px 20px;
+  }
+  .phase-num{font-family:'IBM Plex Mono', monospace;font-size:12px;color:#58a6ff;margin-bottom:10px;}
+  .phase-title{font-size:16px;font-weight:700;margin-bottom:12px;}
+  .phase-list{list-style:none;display:flex;flex-direction:column;gap:9px;}
+  .phase-list li{font-size:13px;color:#c9d1d9;padding-inline-start:16px;position:relative;}
+  .phase-list li::before{content:"—";position:absolute;inset-inline-start:0;color:var(--muted-2);}
+
+  /* ============ CHECKLIST ============ */
+  .checklist{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:26px;}
+  .check-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 28px;}
+  @media (max-width:640px){.check-grid{grid-template-columns:1fr;}}
+  .check-item{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#c9d1d9;padding:8px 0;}
+  .check-item .box{
+    flex-shrink:0;width:18px;height:18px;border-radius:5px;
+    border:1.5px solid #34d399;display:flex;align-items:center;justify-content:center;
+    margin-top:2px;color:#34d399;font-size:12px;
+  }
+
+  footer{
+    text-align:center;margin-top:70px;padding-top:24px;
+    border-top:1px solid var(--card-border);
+    color:var(--muted-2);font-size:12.5px;font-family:'IBM Plex Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<div class="terminal-bar">
+  <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+  <div class="terminal-path">project ~ <span>graduation-project/automation-plan</span> $ run --team=5 --scope=reduced</div>
+</div>
+
+<div class="hero">
+  <div class="eyebrow">AUTOMATION TESTING · PHASE 2</div>
+  <h1>خطة توزيع اختبارات <em>الأتمتة</em> على 5 أشخاص</h1>
+  <p>نسخة مُعدّلة من خطة الـ Manual، بعدد Test Cases أقل بنسبة تقريبية 15% عشان يكون العدد واقعي لوقت الأتمتة، ومُعاد ضبطها بالكامل على حسب الحقول والسلوك الفعلي لموقع <strong>ParaBank</strong>، عشان كل شخص يعرف بالظبط هيشتغل على ايه.</p>
+  <div class="note">مبني على parabank.parasoft.com — بدون OTP / بريد إلكتروني / رفع مستندات (مش موجودين في الموقع فعليًا)</div>
+
+  <div class="stat-row">
+    <div class="stat-chip"><div class="num"><span class="old">91</span>77</div><div class="lbl">إجمالي Test Cases</div></div>
+    <div class="stat-chip"><div class="num">5</div><div class="lbl">مجموعات / أشخاص</div></div>
+    <div class="stat-chip"><div class="num">10</div><div class="lbl">موديولات</div></div>
+    <div class="stat-chip"><div class="num">13–19</div><div class="lbl">مدى العدد لكل مجموعة</div></div>
+  </div>
+</div>
+
+<div class="section-wrap">
+
+  <div class="section-head">
+    <h2>🧩 توزيع المجموعات + تفصيل الـ Test Cases</h2>
+    <span class="tag mono">اضغط على أي موديول لعرض الحالات</span>
+  </div>
+
+  <div class="groups">
+
+    <!-- GROUP 1 -->
+    <div class="group-card c1">
+      <div class="group-head">
+        <div class="group-head-left">
+          <span class="badge-id">GROUP 01</span>
+          <div class="group-title">التسجيل</div>
+        </div>
+        <div class="group-count"><div class="n">13</div><div class="l">test case</div></div>
+      </div>
+      <div class="modules">
+        <details class="module" open>
+          <summary>Register <span class="m-count">13</span></summary>
+          <ol class="tc-list">
+            <li data-i="1">التسجيل بجميع الحقول صحيحة وكاملة (First/Last Name, Address, City, State, Zip, Phone, SSN, Username, Password)</li>
+            <li data-i="2">ترك حقل First Name فارغ</li>
+            <li data-i="3">ترك حقل Last Name فارغ</li>
+            <li data-i="4">ترك حقل Address فارغ</li>
+            <li data-i="5">ترك أحد حقول City / State / Zip Code فارغ</li>
+            <li data-i="6">إدخال Phone# بصيغة غير رقمية</li>
+            <li data-i="7">إدخال SSN بصيغة غير صحيحة</li>
+            <li data-i="8">التسجيل بـ Username مستخدم من قبل (رسالة "This username already exists")</li>
+            <li data-i="9">عدم تطابق Password مع Confirm</li>
+            <li data-i="10">ترك حقل Password فارغ</li>
+            <li data-i="11">التحقق من ظهور رسالة النجاح "Your account was created successfully"</li>
+            <li data-i="12">التحقق من تسجيل الدخول تلقائيًا والانتقال لـ Accounts Overview بعد التسجيل</li>
+            <li data-i="13">إدخال رموز خاصة في حقل First Name / Last Name</li>
+          </ol>
+        </details>
+      </div>
+      <div class="owner-tag">مسؤول واحد — موديول مكثّف</div>
+    </div>
+
+    <!-- GROUP 2 -->
+    <div class="group-card c2">
+      <div class="group-head">
+        <div class="group-head-left">
+          <span class="badge-id">GROUP 02</span>
+          <div class="group-title">الدخول والجلسة</div>
+        </div>
+        <div class="group-count"><div class="n">16</div><div class="l">test case</div></div>
+      </div>
+      <div class="modules">
+        <details class="module">
+          <summary>Login <span class="m-count">7</span></summary>
+          <ol class="tc-list">
+            <li data-i="1">تسجيل الدخول بـ Username و Password صحيحين</li>
+            <li data-i="2">تسجيل الدخول بـ Username غير موجود</li>
+            <li data-i="3">تسجيل الدخول بـ Password خاطئة</li>
+            <li data-i="4">ترك حقل Username فارغ عند الدخول</li>
+            <li data-i="5">ترك حقل Password فارغ عند الدخول</li>
+            <li data-i="6">التحقق من رسالة الخطأ عند بيانات دخول فارغة أو غير صحيحة</li>
+            <li data-i="7">التحقق من التوجيه لصفحة Accounts Overview بعد نجاح الدخول</li>
+          </ol>
+        </details>
+        <details class="module">
+          <summary>Forgot Login Info <span class="m-count">5</span></summary>
+          <ol class="tc-list">
+            <li data-i="1">استرجاع بيانات الدخول ببيانات مطابقة (First/Last Name, Address, City, State, Zip, SSN)</li>
+            <li data-i="2">استرجاع بيانات الدخول ببيانات لا تطابق أي عميل مسجل</li>
+            <li data-i="3">ترك أحد الحقول المطلوبة فارغًا أثناء الاسترجاع</li>
+            <li data-i="4">التحقق من ظهور الـ Username والدخول المباشر بعد نجاح الاسترجاع</li>
+            <li data-i="5">إدخال SSN غير مطابق لباقي البيانات المدخلة</li>
+          </ol>
+        </details>
+        <details class="module">
+          <summary>Log Out <span class="m-count">4</span></summary>
+          <ol class="tc-list">
+            <li data-i="1">تسجيل الخروج الناجح من الحساب</li>
+            <li data-i="2">محاولة الوصول لصفحة محمية (Accounts Overview) بعد Logout</li>
+            <li data-i="3">التحقق من العودة لصفحة تسجيل الدخول بعد Logout</li>
+            <li data-i="4">التحقق من إنهاء الجلسة (Session) فعليًا بعد الخروج</li>
+          </ol>
+        </details>
+      </div>
+      <div class="owner-tag">Session & Auth flows</div>
+    </div>
+
+    <!-- GROUP 3 -->
+    <div class="group-card c3">
+      <div class="group-head">
+        <div class="group-head-left">
+          <span class="badge-id">GROUP 03</span>
+          <div class="group-title">إعداد الحساب</div>
+        </div>
+        <div class="group-count"><div class="n">14</div><div class="l">test case</div></div>
+      </div>
+      <div class="modules">
+        <details class="module">
+          <summary>Open New Account <span class="m-count">7</span></summary>
+          <ol class="tc-list">
+            <li data-i="1">فتح حساب من نوع Checking بنجاح</li>
+            <li data-i="2">فتح حساب من نوع Savings بنجاح</li>
+            <li data-i="3">فتح حساب جديد بالتمويل من حساب موجود (From Existing Account)</li>
+            <li data-i="4">فتح حساب بدون اختيار From Existing Account</li>
+            <li data-i="5">التحقق من ظهور رقم الحساب الجديد (New Account ID) بعد الفتح</li>
+            <li data-i="6">فتح حساب لعميل ليس لديه أي حساب مصدر متاح</li>
+            <li data-i="7">التحقق من ظهور الحساب الجديد فورًا في Accounts Overview</li>
+          </ol>
+        </details>
+        <details class="module">
+          <summary>Accounts Overview <span class="m-count">7</span></summary>
+          <ol class="tc-list">
+            <li data-i="1">عرض قائمة كل الحسابات وأرصدتها</li>
+            <li data-i="2">الضغط على حساب معين وعرض تفاصيله (Account Activity)</li>
+            <li data-i="3">عرض المعاملات (Transactions) الخاصة بحساب معين</li>
+            <li data-i="4">التحقق من صحة إجمالي الأرصدة (Total Balance)</li>
+            <li data-i="5">عرض حساب برصيد صفر</li>
+            <li data-i="6">عرض حساب بدون أي معاملات سابقة</li>
+            <li data-i="7">التنقل بين أكثر من حساب من نفس الصفحة</li>
+          </ol>
+        </details>
+      </div>
+      <div class="owner-tag">Account setup & display</div>
+    </div>
+
+    <!-- GROUP 4 -->
+    <div class="group-card c4">
+      <div class="group-head">
+        <div class="group-head-left">
+          <span class="badge-id">GROUP 04</span>
+          <div class="group-title">المدفوعات والتحويلات</div>
+        </div>
+        <div class="group-count"><div class="n">19</div><div class="l">test case</div></div>
+      </div>
+      <div class="modules">
+        <details class="module">
+          <summary>Transfer Funds <span class="m-count">8</span></summary>
+          <ol class="tc-list">
+            <li data-i="1">تحويل ناجح بين حسابين تابعين لنفس العميل</li>
+            <li data-i="2">تحويل مبلغ أكبر من الرصيد المتاح في From Account</li>
+            <li data-i="3">تحويل بمبلغ صفر</li>
+            <li data-i="4">تحويل بمبلغ سالب أو غير رقمي</li>
+            <li data-i="5">التحويل من حساب لنفس الحساب (From = To)</li>
+            <li data-i="6">التحقق من تحديث رصيد الحسابين فورًا بعد التحويل</li>
+            <li data-i="7">التحقق من ظهور رسالة "Transfer Complete"</li>
+            <li data-i="8">محاولة التحويل بدون اختيار To Account</li>
+          </ol>
+        </details>
+        <details class="module">
+          <summary>Bill Pay <span class="m-count">11</span></summary>
+          <ol class="tc-list">
+            <li data-i="1">دفع فاتورة ببيانات Payee كاملة وصحيحة</li>
+            <li data-i="2">ترك حقل Payee Name فارغ</li>
+            <li data-i="3">ترك حقل Amount فارغ</li>
+            <li data-i="4">إدخال Amount بصيغة غير رقمية</li>
+            <li data-i="5">عدم تطابق Account و Verify Account</li>
+            <li data-i="6">دفع فاتورة برصيد From Account أقل من المبلغ المطلوب</li>
+            <li data-i="7">ترك أحد حقول Address / City / State / Zip فارغ</li>
+            <li data-i="8">إدخال Phone# غير صالح في بيانات الـ Payee</li>
+            <li data-i="9">التحقق من ظهور رسالة "Bill Payment Complete"</li>
+            <li data-i="10">التحقق من خصم المبلغ من From Account بعد الدفع</li>
+            <li data-i="11">الدفع باستخدام From Account غير تابع للعميل الحالي</li>
+          </ol>
+        </details>
+      </div>
+      <div class="owner-tag">أكبر مجموعة — ممكن تحتاج دعم جزئي</div>
+    </div>
+
+    <!-- GROUP 5 -->
+    <div class="group-card c5">
+      <div class="group-head">
+        <div class="group-head-left">
+          <span class="badge-id">GROUP 05</span>
+          <div class="group-title">القروض والبروفايل</div>
+        </div>
+        <div class="group-count"><div class="n">15</div><div class="l">test case</div></div>
+      </div>
+      <div class="modules">
+        <details class="module">
+          <summary>Request Loan <span class="m-count">7</span></summary>
+          <ol class="tc-list">
+            <li data-i="1">طلب قرض بمبلغ ودفعة أولى تؤدي لموافقة فورية (Approved)</li>
+            <li data-i="2">طلب قرض بمبلغ ودفعة أولى تؤدي لرفض فوري (Denied)</li>
+            <li data-i="3">ترك حقل Amount فارغ</li>
+            <li data-i="4">ترك حقل Down Payment فارغ</li>
+            <li data-i="5">إدخال Amount بقيمة سالبة أو غير رقمية</li>
+            <li data-i="6">التحقق من إنشاء Loan Account جديد عند الموافقة</li>
+            <li data-i="7">التحقق من ظهور حالة الطلب (Approved/Denied) بوضوح للمستخدم</li>
+          </ol>
+        </details>
+        <details class="module">
+          <summary>Update Contact Info <span class="m-count">8</span></summary>
+          <ol class="tc-list">
+            <li data-i="1">تعديل First Name / Last Name / Address بنجاح</li>
+            <li data-i="2">ترك حقل First Name فارغ عند التعديل</li>
+            <li data-i="3">ترك حقل Address فارغ عند التعديل</li>
+            <li data-i="4">إدخال Phone# غير صالح</li>
+            <li data-i="5">تعديل City / State فقط دون باقي الحقول</li>
+            <li data-i="6">التحقق من ظهور رسالة "Profile Updated Successfully"</li>
+            <li data-i="7">التحقق من انعكاس التعديلات في باقي صفحات الحساب</li>
+            <li data-i="8">إدخال Zip Code بصيغة غير صحيحة</li>
+          </ol>
+        </details>
+      </div>
+      <div class="owner-tag">Workflow & forms</div>
+    </div>
+
+  </div>
+
+  <div class="section-head">
+    <h2>🚀 خطوات الاشتغال في الأتمتة</h2>
+    <span class="tag mono">roadmap.md</span>
+  </div>
+
+  <div class="phases">
+    <div class="phase-card">
+      <div class="phase-num">PHASE 01</div>
+      <div class="phase-title">الإعداد</div>
+      <ul class="phase-list">
+        <li>اختاروا أداة واحدة للفريق كله (Selenium أو Playwright)</li>
+        <li>مشروع واحد على GitHub، كل حد على branch خاص بمجموعته</li>
+        <li>ملف config موحّد للبيئات (URL, credentials, browser)</li>
+        <li>هيكل مجلدات موحّد قبل ما حد يكتب أول سطر كود</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <div class="phase-num">PHASE 02</div>
+      <div class="phase-title">التصميم</div>
+      <ul class="phase-list">
+        <li>Page Object Model — كل صفحة/موديول في كلاس منفصل</li>
+        <li>تسمية موحّدة للـ tests والـ methods (نفس الـ convention للكل)</li>
+        <li>Locators في مكان مركزي، مش متكررة جوه كل test</li>
+        <li>كل مجموعة تعمل الـ Page Objects بتاعتها في مجلدها فقط</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <div class="phase-num">PHASE 03</div>
+      <div class="phase-title">البناء</div>
+      <ul class="phase-list">
+        <li>اكتبوا الـ helpers المشتركة أول حاجة (login helper, setup/teardown)</li>
+        <li>فصلوا بيانات الاختبار عن الكود (JSON / Excel / .env)</li>
+        <li>استخدموا Explicit Waits، تجنبوا Thread.sleep نهائيًا</li>
+        <li>كل test case يبقى مستقل، متعتمدش على test قبله</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <div class="phase-num">PHASE 04</div>
+      <div class="phase-title">التنفيذ</div>
+      <ul class="phase-list">
+        <li>Tag كل test بـ smoke / regression عشان تشغلوا اللي محتاجينه بس</li>
+        <li>شغّلوا الاختبارات parallel لو الأداة بتدعم كده</li>
+        <li>اربطوا المشروع بـ CI/CD (GitHub Actions) لتشغيل تلقائي</li>
+        <li>مراجعة يومية سريعة (15 دقيقة) لمتابعة الـ blockers</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <div class="phase-num">PHASE 05</div>
+      <div class="phase-title">التقارير</div>
+      <ul class="phase-list">
+        <li>استخدموا أداة تقارير زي Allure أو Extent Reports</li>
+        <li>Screenshot تلقائي عند فشل أي test</li>
+        <li>Pull Request + code review قبل الدمج على main</li>
+        <li>وثّقوا كل bug اتكشف أثناء الأتمتة في تراكر واحد</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <h2>✅ قواعد أساسية قبل ما تبدأوا</h2>
+    <span class="tag mono">ground-rules.md</span>
+  </div>
+
+  <div class="checklist">
+    <div class="check-grid">
+      <div class="check-item"><div class="box">✓</div>ممنوع أي حد يبدأ كود قبل ما هيكل الـ Framework يتاعتمد من الكل</div>
+      <div class="check-item"><div class="box">✓</div>الشخص اللي أخد Group 4 (19 TC) ممكن ياخد مساعدة جزئية من زميل تاني لو الوقت ضيّق</div>
+      <div class="check-item"><div class="box">✓</div>كل مجموعة تسلّم بنفس التنسيق: اسم الملف، اسم الـ test، وتقرير التنفيذ</div>
+      <div class="check-item"><div class="box">✓</div>لازم نسخة اختبار على بيئة موحّدة، مش كل واحد بيئته الخاصة</div>
+      <div class="check-item"><div class="box">✓</div>مراجعة أسبوعية تجمع كل المجموعات على نفس الـ dashboard</div>
+      <div class="check-item"><div class="box">✓</div>أي كود مشترك (helpers/utilities) بيتحط في مجلد common، مش بيتكرر</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>graduation-project / software-testing / automation-phase · 77 test cases (−15% من الخطة اليدوية) · 5 groups</footer>
+
+</body>
+</html>

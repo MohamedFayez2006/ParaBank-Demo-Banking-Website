@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خطة اختبار قاعدة بيانات Northwind</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F4EE;
+    --surface:#FFFFFF;
+    --ink:#1B2430;
+    --ink-soft:#5B6472;
+    --line:#E4E0D4;
+    --blue:#2B5797;
+    --blue-soft:#EAF0F8;
+
+    --p1:#2B6CB0; --p1-soft:#E9F1FA;
+    --p2:#2F855A; --p2-soft:#EAF6EF;
+    --p3:#B7791F; --p3-soft:#FBF3E3;
+    --p4:#9B2C2C; --p4-soft:#FBEBEB;
+    --p5:#6B46C1; --p5-soft:#F1ECFB;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Tajawal',sans-serif;
+    line-height:1.75;
+  }
+  .mono{font-family:'JetBrains Mono',monospace; direction:ltr; unicode-bidi:embed;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+
+  /* HERO */
+  header.hero{
+    background:linear-gradient(180deg,#1B2430 0%,#25324A 100%);
+    color:#F6F4EE;
+    padding:64px 0 48px;
+    border-bottom:6px solid var(--blue);
+  }
+  header.hero .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.12em;
+    font-size:13px;
+    color:#9FB6D9;
+    margin-bottom:14px;
+    direction:ltr;
+    text-align:right;
+  }
+  header.hero h1{
+    font-size:clamp(28px,4vw,42px);
+    font-weight:900;
+    margin:0 0 14px;
+  }
+  header.hero p{
+    color:#C7D0DD;
+    font-size:17px;
+    max-width:640px;
+    margin:0;
+  }
+  .schema-strip{
+    margin-top:32px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .schema-strip span{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    padding:5px 10px;
+    border-radius:4px;
+    background:rgba(255,255,255,.08);
+    color:#E4E9F0;
+    border:1px solid rgba(255,255,255,.14);
+    direction:ltr;
+  }
+
+  section{padding:56px 0;}
+  section.alt{background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+
+  h2.section-title{
+    font-size:26px;
+    font-weight:900;
+    margin:0 0 8px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  h2.section-title .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--blue);
+    border:1px solid var(--blue);
+    border-radius:20px;
+    padding:3px 10px;
+    direction:ltr;
+  }
+  .section-lead{color:var(--ink-soft); max-width:680px; margin-bottom:36px; font-size:15.5px;}
+
+  /* Concept grid */
+  .concept-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px;
+  }
+  .concept-card{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px;
+  }
+  .concept-card .num{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--blue);
+    font-size:13px;
+    margin-bottom:8px;
+    display:block;
+  }
+  .concept-card h3{margin:0 0 8px; font-size:16px;}
+  .concept-card p{margin:0; font-size:14px; color:var(--ink-soft);}
+
+  /* Roadmap */
+  .roadmap{
+    counter-reset:step;
+    border-right:2px solid var(--line);
+    padding-right:28px;
+  }
+  .step{
+    position:relative;
+    margin-bottom:34px;
+  }
+  .step:last-child{margin-bottom:0;}
+  .step::before{
+    counter-increment:step;
+    content: counter(step, decimal-leading-zero);
+    font-family:'JetBrains Mono',monospace;
+    position:absolute;
+    right:-28px;
+    top:0;
+    transform:translateX(50%);
+    background:var(--blue);
+    color:#fff;
+    width:34px;height:34px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;
+  }
+  .step h3{margin:0 0 6px; font-size:17px;}
+  .step p{margin:0; color:var(--ink-soft); font-size:14.5px; max-width:680px;}
+  .step .example{
+    margin-top:8px;
+    background:var(--blue-soft);
+    border-radius:6px;
+    padding:8px 12px;
+    font-size:13px;
+    color:#2B5797;
+    display:inline-block;
+  }
+
+  /* Team distribution */
+  .team-map{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:10px;
+    margin-bottom:40px;
+  }
+  .map-chip-group{
+    border-radius:10px;
+    padding:14px 16px;
+    border:1px solid var(--line);
+  }
+  .map-chip-group .who{font-weight:700; font-size:13.5px; margin-bottom:8px;}
+  .map-chip-group .tables{display:flex; flex-wrap:wrap; gap:6px;}
+  .map-chip-group .tables span{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    padding:3px 8px;
+    border-radius:4px;
+    direction:ltr;
+  }
+
+  .member-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    margin-bottom:22px;
+    overflow:hidden;
+  }
+  .member-card .card-head{
+    padding:18px 22px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .member-card .card-head h3{margin:0; font-size:18px;}
+  .member-card .card-head .count{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    padding:4px 10px;
+    border-radius:20px;
+    color:#fff;
+  }
+  .member-card .card-body{padding:0 22px 20px;}
+  .member-card .tools{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .member-card .tools b{color:var(--ink);}
+  .member-card ol{margin:0; padding-inline-start:20px;}
+  .member-card ol li{margin-bottom:7px; font-size:14.5px;}
+  .cat-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    margin:14px 0 6px;
+    display:block;
+  }
+
+  /* Template table */
+  table.tc-template{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  table.tc-template th{
+    background:#1B2430;
+    color:#F6F4EE;
+    padding:10px 12px;
+    text-align:right;
+    font-weight:700;
+    font-size:12.5px;
+  }
+  table.tc-template td{
+    padding:10px 12px;
+    border-top:1px solid var(--line);
+    color:var(--ink-soft);
+  }
+  table.tc-template tr:nth-child(even) td{background:var(--bg);}
+
+  footer{
+    padding:40px 0 60px;
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:13.5px;
+  }
+  footer .mono{font-size:12px;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">GRADUATION PROJECT · SOFTWARE TESTING · DATABASE MODULE</div>
+    <h1>خطة اختبار قاعدة بيانات Northwind</h1>
+    <p>توزيع كامل للشغل على 5 أفراد، مبني على جداول قاعدة بيانات Northwind الفعلية، مع شرح مفصّل لكل خطوة عشان الفريق كله يتدرب صح من الصفر.</p>
+    <div class="schema-strip">
+      <span>Categories</span><span>Products</span><span>Suppliers</span><span>Customers</span>
+      <span>Employees</span><span>Orders</span><span>Order Details</span><span>Shippers</span>
+      <span>Region</span><span>Territories</span><span>EmployeeTerritories</span>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== SECTION 1: WHAT IS DB TESTING ===================== -->
+<section>
+  <div class="wrap">
+    <h2 class="section-title">إيه هو الـ Database Testing أصلاً؟ <span class="tag">CONCEPT</span></h2>
+    <p class="section-lead">
+      ببساطة: أنت مش بتختبر الواجهة (UI)، أنت بتختبر "الطبقة اللي مختفية ورا الواجهة" — الجداول، العلاقات بينها، والقواعد اللي المفروض تتحفظ. هدفك تتأكد إن البيانات بتتخزن صح، وبترتبط صح، ومحدش يقدر يدخّل بيانات غلط تكسر النظام.
+      الاختبار بينقسم لأنواع رئيسية، وكل واحد فيكم هيغطي كل الأنواع دي لكن على الجداول اللي اتوزعت عليه:
+    </p>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <span class="num">01 · SCHEMA</span>
+        <h3>اختبار البنية</h3>
+        <p>هل الجدول عنده الأعمدة الصح، بنوع البيانات الصح (نص، رقم، تاريخ)؟</p>
+      </div>
+      <div class="concept-card">
+        <span class="num">02 · CONSTRAINTS</span>
+        <h3>اختبار القيود</h3>
+        <p>Primary Key، Foreign Key، Not Null، Unique — هل فعلاً بتتفعّل ولا ممكن تتكسر؟</p>
+      </div>
+      <div class="concept-card">
+        <span class="num">03 · CRUD</span>
+        <h3>الإضافة/التعديل/الحذف</h3>
+        <p>Insert / Select / Update / Delete — بحالات صح (Positive) وحالات غلط متعمدة (Negative).</p>
+      </div>
+      <div class="concept-card">
+        <span class="num">04 · INTEGRITY</span>
+        <h3>تكامل البيانات</h3>
+        <p>مفيش سجل "يتيم" (Orphan) — يعني مفيش Order مرتبط بعميل مش موجود مثلًا.</p>
+      </div>
+      <div class="concept-card">
+        <span class="num">05 · BUSINESS RULES</span>
+        <h3>قواعد العمل المنطقية</h3>
+        <p>سعر المنتج مينفعش يكون سالب، تاريخ التوريد مينفعش يسبق تاريخ الطلب... إلخ.</p>
+      </div>
+      <div class="concept-card">
+        <span class="num">06 · PERFORMANCE</span>
+        <h3>الأداء</h3>
+        <p>لو الاستعلام (Query) فيه أكتر من Join، بياخد وقت معقول ولا بطيء جدًا؟</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SECTION 2: STEP BY STEP ===================== -->
+<section class="alt">
+  <div class="wrap">
+    <h2 class="section-title">الخطوات اللي هتعملوها فعليًا <span class="tag">STEP BY STEP</span></h2>
+    <p class="section-lead">
+      دي الخطوات اللي كل فرد في الفريق هيمشي عليها بالظبط، من أول ما يفتح قاعدة البيانات، لحد ما يسلّم تقرير الاختبار النهائي.
+    </p>
+    <div class="roadmap">
+      <div class="step">
+        <h3>جهّز البيئة</h3>
+        <p>نزّل MySQL Workbench (أو SQL Server + SSMS)، وارجع لسكريبت قاعدة بيانات Northwind وشغّله عشان تتكوّن الجداول والبيانات عندك محليًا.</p>
+        <span class="example mono">Tool: MySQL Workbench / SSMS</span>
+      </div>
+      <div class="step">
+        <h3>افهم الـ Schema بتاعك الأول</h3>
+        <p>افتح الـ ER Diagram أو استخدم <span class="mono">DESCRIBE table_name;</span> لكل جدول من الجداول اللي اتوزعت عليك، واكتب لنفسك: الأعمدة، النوع، وأنهي عمود PK وأنهي عمود FK.</p>
+      </div>
+      <div class="step">
+        <h3>اكتب Test Cases قبل ما تشغّل أي حاجة</h3>
+        <p>افتح Excel وابدأ تكتب سيناريوهات الاختبار (شوف جدول القالب تحت) — الهدف إنك تحدد "هتختبر إيه" قبل ما تكتب أي SQL Query.</p>
+      </div>
+      <div class="step">
+        <h3>نفّذ اختبارات الـ Schema والقيود</h3>
+        <p>اتأكد إن كل Constraint (PK, FK, NOT NULL, UNIQUE) فعلاً شغال، عن طريق محاولة تكسره عمدًا (مثلاً تدخل قيمة مكررة) وتشوف هل النظام بيرفض صح.</p>
+      </div>
+      <div class="step">
+        <h3>نفّذ اختبارات CRUD</h3>
+        <p>لكل جدول: اعمل Insert صحيح، Insert غلط متعمد، Update، Delete، وسجّل الـ Actual Result قدام الـ Expected Result في نفس الجدول.</p>
+      </div>
+      <div class="step">
+        <h3>اختبر التكامل والعلاقات (Joins)</h3>
+        <p>اكتب Queries فيها Join بين جدولين أو أكتر (زي Orders مع Customers) وتأكد إن النتيجة منطقية ومفيش بيانات ناقصة أو مكررة غلط.</p>
+      </div>
+      <div class="step">
+        <h3>اختبر القواعد المنطقية (Business Rules)</h3>
+        <p>دي مش قيود في الـ Database نفسها، دي منطق: هل السعر ممكن يبقى سالب؟ هل تاريخ الشحن ممكن يسبق تاريخ الطلب؟ لو النظام سمح بيها، ده Bug.</p>
+      </div>
+      <div class="step">
+        <h3>وثّق النتائج وسلّم للفريق</h3>
+        <p>كل فرد يسلّم ملف الـ Test Cases بتاعه (Pass/Fail لكل حالة)، وبعدين يتجمّعوا في تقرير واحد نهائي للمشروع.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SECTION 3: TEAM DISTRIBUTION ===================== -->
+<section>
+  <div class="wrap">
+    <h2 class="section-title">توزيع الشغل على الفريق (5 أفراد) <span class="tag">TEAM SPLIT</span></h2>
+    <p class="section-lead">
+      التوزيع اتبنى على مجموعات الجداول المرتبطة منطقيًا في Northwind، عشان كل واحد يشتغل على "دومين" متكامل بدل جداول عشوائية.
+    </p>
+
+    <div class="team-map">
+      <div class="map-chip-group" style="border-color:var(--p1);">
+        <div class="who" style="color:var(--p1);">Person 1 — العملاء والموردين</div>
+        <div class="tables">
+          <span style="background:var(--p1-soft); color:var(--p1);">Customers</span>
+          <span style="background:var(--p1-soft); color:var(--p1);">Suppliers</span>
+        </div>
+      </div>
+      <div class="map-chip-group" style="border-color:var(--p2);">
+        <div class="who" style="color:var(--p2);">Person 2 — المنتجات والفئات</div>
+        <div class="tables">
+          <span style="background:var(--p2-soft); color:var(--p2);">Products</span>
+          <span style="background:var(--p2-soft); color:var(--p2);">Categories</span>
+        </div>
+      </div>
+      <div class="map-chip-group" style="border-color:var(--p3);">
+        <div class="who" style="color:var(--p3);">Person 3 — الموظفين</div>
+        <div class="tables">
+          <span style="background:var(--p3-soft); color:var(--p3);">Employees</span>
+        </div>
+      </div>
+      <div class="map-chip-group" style="border-color:var(--p4);">
+        <div class="who" style="color:var(--p4);">Person 4 — الطلبات (العمود الفقري)</div>
+        <div class="tables">
+          <span style="background:var(--p4-soft); color:var(--p4);">Orders</span>
+          <span style="background:var(--p4-soft); color:var(--p4);">Order Details</span>
+        </div>
+      </div>
+      <div class="map-chip-group" style="border-color:var(--p5);">
+        <div class="who" style="color:var(--p5);">Person 5 — الشحن + تكامل عام</div>
+        <div class="tables">
+          <span style="background:var(--p5-soft); color:var(--p5);">Shippers</span>
+          <span style="background:var(--p5-soft); color:var(--p5);">Region</span>
+          <span style="background:var(--p5-soft); color:var(--p5);">Territories</span>
+          <span style="background:var(--p5-soft); color:var(--p5);">EmployeeTerritories</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Person 1 -->
+    <div class="member-card" style="border-top:4px solid var(--p1);">
+      <div class="card-head">
+        <h3>Person 1 — Customers &amp; Suppliers</h3>
+        <span class="count" style="background:var(--p1);">12 Test Cases</span>
+      </div>
+      <div class="card-body">
+        <div class="tools">الأدوات: <b class="mono">MySQL Workbench</b> · Excel لتوثيق الحالات</div>
+        <span class="cat-label">Schema &amp; Constraints</span>
+        <ol>
+          <li>التحقق من أعمدة جدول <span class="mono">Customers</span> وأنواع بياناتها مطابقة للتصميم.</li>
+          <li>التحقق من أن <span class="mono">CustomerID</span> مفتاح أساسي (Primary Key) ولا يقبل التكرار.</li>
+          <li>التحقق من أن <span class="mono">CustomerID</span> لا يقبل قيمة NULL.</li>
+          <li>التحقق من عدم تكرار <span class="mono">SupplierID</span> في جدول Suppliers.</li>
+        </ol>
+        <span class="cat-label">CRUD</span>
+        <ol>
+          <li>اختبار إضافة عميل جديد بكل البيانات المطلوبة (Insert صحيح).</li>
+          <li>اختبار إضافة عميل بدون CustomerID والتأكد من ظهور خطأ (Insert خطأ متعمد).</li>
+          <li>اختبار تعديل بيانات عميل موجود (Update).</li>
+          <li>اختبار إضافة مورّد جديد بكل الحقول المطلوبة.</li>
+        </ol>
+        <span class="cat-label">Integrity &amp; Business Rules</span>
+        <ol>
+          <li>اختبار حذف عميل مرتبط بطلبات (Orders) والتأكد من سلوك النظام (رفض أو Cascade).</li>
+          <li>اختبار حذف Supplier مرتبط بمنتجات (Products) — هل النظام يرفض الحذف؟</li>
+          <li>التحقق من صحة تنسيق الحقول مثل Phone و PostalCode لو فيه قيود عليها.</li>
+          <li>اختبار استعلام: البحث عن عملاء حسب City أو Country (Select Query).</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Person 2 -->
+    <div class="member-card" style="border-top:4px solid var(--p2);">
+      <div class="card-head">
+        <h3>Person 2 — Products &amp; Categories</h3>
+        <span class="count" style="background:var(--p2);">12 Test Cases</span>
+      </div>
+      <div class="card-body">
+        <div class="tools">الأدوات: <b class="mono">MySQL Workbench</b> · Excel لتوثيق الحالات</div>
+        <span class="cat-label">Schema &amp; Constraints</span>
+        <ol>
+          <li>التحقق من أعمدة جدول <span class="mono">Products</span> وأنواع البيانات (خصوصًا UnitPrice كـ Decimal).</li>
+          <li>التحقق من أن <span class="mono">ProductID</span> مفتاح أساسي وفريد.</li>
+          <li>التحقق من أن <span class="mono">CategoryID</span> في Products مرتبط فعليًا بقيمة موجودة في Categories (Foreign Key).</li>
+        </ol>
+        <span class="cat-label">CRUD &amp; Business Rules</span>
+        <ol>
+          <li>اختبار إدخال منتج بسعر سالب (UnitPrice = -5) والتأكد من الرفض.</li>
+          <li>اختبار إدخال منتج بكمية مخزون سالبة (UnitsInStock &lt; 0).</li>
+          <li>اختبار تحديث سعر منتج (Update) والتأكد من التحديث الصحيح.</li>
+          <li>التحقق من أن عمود <span class="mono">Discontinued</span> يقبل فقط 0 أو 1.</li>
+          <li>اختبار إضافة فئة (Category) جديدة والتأكد من ظهورها مرتبطة بالمنتجات صح.</li>
+        </ol>
+        <span class="cat-label">Integrity, Joins &amp; Performance</span>
+        <ol>
+          <li>اختبار حذف منتج مستخدم فعليًا داخل Order Details — هل يُرفض الحذف؟</li>
+          <li>اختبار استعلام: جلب كل المنتجات في فئة معينة (Join بين Products و Categories).</li>
+          <li>التحقق من عدم تكرار اسم نفس المنتج لو فيه قيد Unique على ProductName.</li>
+          <li>قياس وقت تنفيذ استعلام لجلب كل المنتجات مرتبة حسب السعر (اختبار أداء مبدئي).</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Person 3 -->
+    <div class="member-card" style="border-top:4px solid var(--p3);">
+      <div class="card-head">
+        <h3>Person 3 — Employees</h3>
+        <span class="count" style="background:var(--p3);">11 Test Cases</span>
+      </div>
+      <div class="card-body">
+        <div class="tools">الأدوات: <b class="mono">MySQL Workbench</b> · Excel لتوثيق الحالات</div>
+        <span class="cat-label">Schema &amp; Constraints</span>
+        <ol>
+          <li>التحقق من أعمدة جدول <span class="mono">Employees</span> وأنواع بياناتها (تواريخ، نصوص، أرقام).</li>
+          <li>التحقق من أن <span class="mono">EmployeeID</span> مفتاح أساسي وفريد.</li>
+          <li>التحقق من عدم قبول قيم NULL في الحقول الأساسية (FirstName, LastName).</li>
+        </ol>
+        <span class="cat-label">العلاقة الذاتية (Self-Reference)</span>
+        <ol>
+          <li>اختبار أن <span class="mono">ReportsTo</span> إما NULL (للمدير الأعلى) أو EmployeeID موجود فعلاً.</li>
+          <li>اختبار عدم وجود حلقة دائرية في التسلسل الإداري (موظف يبقى مدير لنفسه بشكل غير مباشر).</li>
+          <li>اختبار استعلام لعرض الهيكل الإداري الكامل (اسم الموظف + اسم المدير) باستخدام Self Join.</li>
+        </ol>
+        <span class="cat-label">CRUD &amp; Business Rules</span>
+        <ol>
+          <li>اختبار إدخال موظف جديد بكل البيانات المطلوبة (Insert).</li>
+          <li>اختبار إدخال موظف بتاريخ ميلاد بعد تاريخ التعيين (BirthDate &gt; HireDate) — لازم يترفض منطقيًا.</li>
+          <li>اختبار تحديث بيانات موظف (تغيير Title أو ReportsTo).</li>
+          <li>اختبار حذف موظف له مرؤوسين (Subordinates) — هل بيأثر عليهم؟</li>
+          <li>اختبار حذف موظف مرتبط بطلبات (Orders) — Referential Integrity.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Person 4 -->
+    <div class="member-card" style="border-top:4px solid var(--p4);">
+      <div class="card-head">
+        <h3>Person 4 — Orders &amp; Order Details</h3>
+        <span class="count" style="background:var(--p4);">13 Test Cases</span>
+      </div>
+      <div class="card-body">
+        <div class="tools">الأدوات: <b class="mono">MySQL Workbench</b> · Excel لتوثيق الحالات — ده الجزء الأكبر، هو "قلب" قاعدة البيانات.</div>
+        <span class="cat-label">Schema &amp; Constraints</span>
+        <ol>
+          <li>التحقق من أعمدة الجدولين وأنواع البيانات (خصوصًا Quantity, UnitPrice, Discount).</li>
+          <li>التحقق من أن <span class="mono">OrderID</span> مفتاح أساسي وفريد.</li>
+          <li>التحقق من أن Order Details مرتبط بـ Orders و Products بشكل صحيح (Foreign Keys).</li>
+        </ol>
+        <span class="cat-label">Business Rules</span>
+        <ol>
+          <li>اختبار أن <span class="mono">OrderDate</span> يسبق أو يساوي <span class="mono">RequiredDate</span> و <span class="mono">ShippedDate</span>.</li>
+          <li>اختبار إدخال Order Detail بكمية = 0 أو بالسالب.</li>
+          <li>اختبار أن قيمة <span class="mono">Discount</span> لا تتجاوز المدى المنطقي (بين 0 و 1).</li>
+          <li>اختبار حساب الإجمالي الصحيح لكل عنصر: (UnitPrice × Quantity) − Discount.</li>
+        </ol>
+        <span class="cat-label">CRUD, Integrity, Joins &amp; Performance</span>
+        <ol>
+          <li>اختبار إدخال طلب بـ CustomerID غير موجود (FK خاطئ) والتأكد من الرفض.</li>
+          <li>اختبار حذف Order والتأكد من تأثيره على Order Details المرتبطة (Cascade أو Restrict).</li>
+          <li>اختبار تحديث <span class="mono">ShipVia</span> والتأكد من ارتباطه الصحيح بجدول Shippers.</li>
+          <li>اختبار استعلام: جلب تفاصيل طلب معين مع اسم المنتج والعميل (Join متعدد الجداول).</li>
+          <li>قياس وقت تنفيذ استعلام لجلب كل الطلبات في فترة زمنية معينة (اختبار أداء).</li>
+          <li>اختبار حالة Positive كاملة: إنشاء Order جديد + Order Details مرتبطة، والتأكد إن كل حاجة اترّبطت صح.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Person 5 -->
+    <div class="member-card" style="border-top:4px solid var(--p5);">
+      <div class="card-head">
+        <h3>Person 5 — Shippers / Region / Territories + تكامل عام</h3>
+        <span class="count" style="background:var(--p5);">11 Test Cases</span>
+      </div>
+      <div class="card-body">
+        <div class="tools">الأدوات: <b class="mono">MySQL Workbench</b> · Excel — بالإضافة لدور تجميع التقرير النهائي للفريق.</div>
+        <span class="cat-label">Schema &amp; Constraints</span>
+        <ol>
+          <li>التحقق من أعمدة جداول Shippers, Region, Territories وأنواع بياناتها.</li>
+          <li>التحقق من أن ShipperID و RegionID و TerritoryID كلهم مفاتيح أساسية فريدة.</li>
+          <li>التحقق من أن RegionID في Territories مرتبط فعليًا بسجل موجود في Region (FK).</li>
+          <li>التحقق من أن EmployeeTerritories تربط Employee و Territory بشكل صحيح (Composite Key / Many-to-Many).</li>
+        </ol>
+        <span class="cat-label">CRUD &amp; Integrity</span>
+        <ol>
+          <li>اختبار إضافة Shipper جديد وربطه بطلب فعلي (Order).</li>
+          <li>اختبار حذف Region مرتبط بـ Territories — هل يُرفض الحذف أم يُسمح به؟</li>
+          <li>فحص شامل لعدم وجود سجلات يتيمة (Orphan Records) في أي جدول بالقاعدة كلها.</li>
+        </ol>
+        <span class="cat-label">تكامل عام، أداء وأمان (Cross-cutting)</span>
+        <ol>
+          <li>قياس وقت تنفيذ استعلام معقد بأكثر من Join (مثلاً Orders + Customers + Employees + Products).</li>
+          <li>مراجعة الـ Indexes الموجودة على الجداول الأساسية والتأكد أنها تخدم الأداء.</li>
+          <li>اختبار مبدئي لمحاولة SQL Injection في أي مدخل يتصل مباشرة بالقاعدة (لو موجود).</li>
+          <li>تجميع نتائج الفريق كله (Pass/Fail لكل الحالات) في تقرير Excel/Word نهائي واحد.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SECTION 4: TEMPLATE ===================== -->
+<section class="alt">
+  <div class="wrap">
+    <h2 class="section-title">قالب توثيق الـ Test Case <span class="tag">TEMPLATE</span></h2>
+    <p class="section-lead">كل فرد يستخدم نفس الشكل ده في Excel عشان لما يتجمّعوا كلهم يبقوا متسقين.</p>
+    <table class="tc-template">
+      <thead>
+        <tr>
+          <th>Test Case ID</th>
+          <th>الوصف</th>
+          <th>خطوات التنفيذ</th>
+          <th>النتيجة المتوقعة</th>
+          <th>النتيجة الفعلية</th>
+          <th>الحالة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">TC_CUST_002</td>
+          <td>منع تكرار CustomerID</td>
+          <td>إدخال عميل بنفس CustomerID لعميل موجود مسبقًا</td>
+          <td>النظام يرفض الإدخال (Duplicate Key Error)</td>
+          <td>—</td>
+          <td>Pending</td>
+        </tr>
+        <tr>
+          <td class="mono">TC_PROD_004</td>
+          <td>منع السعر السالب</td>
+          <td>إدخال منتج بقيمة UnitPrice = -10</td>
+          <td>النظام يرفض القيمة أو يوجد قيد يمنعها</td>
+          <td>—</td>
+          <td>Pending</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>خطة كاملة قابلة للتنفيذ من أي فرد في الفريق بشكل مستقل، ثم تجميع النتائج في تقرير واحد نهائي.</p>
+    <p class="mono">Northwind Database Testing Plan · 5-Person Distribution</p>
+  </div>
+</footer>
+
+</body>
+</html>

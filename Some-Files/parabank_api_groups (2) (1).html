@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ParaBank API — توزيع Test Cases على 5 أعضاء</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f3ef;--sur:#fff;--sur2:#f0eeea;--bd:rgba(0,0,0,.09);--bdS:rgba(0,0,0,.15);
+  --tx:#1a1a18;--tx2:#56554f;--tx3:#9a9890;
+  --c1:#185FA5;--c1b:#E6F1FB;--c1a:#378ADD;--c1d:#0C447C;
+  --c2:#0F6E56;--c2b:#E1F5EE;--c2a:#1D9E75;--c2d:#085041;
+  --c3:#854F0B;--c3b:#FAEEDA;--c3a:#BA7517;--c3d:#633806;
+  --c4:#534AB7;--c4b:#EEEDFE;--c4a:#7F77DD;--c4d:#3C3489;
+  --c5:#993C1D;--c5b:#FAECE7;--c5a:#D85A30;--c5d:#712B13;
+}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--tx);padding:2rem 1rem;min-height:100vh}
+.page{max-width:1020px;margin:0 auto}
+
+/* HEADER */
+.hdr{text-align:center;margin-bottom:1.75rem}
+.hdr .eye{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:.4rem}
+.hdr h1{font-size:26px;font-weight:700;margin-bottom:.35rem}
+.hdr .url{display:inline-block;font-size:12px;font-family:'Courier New',monospace;background:var(--sur);border:1px solid var(--bd);border-radius:6px;padding:3px 12px;color:var(--tx2)}
+
+/* STATS */
+.stats{display:flex;justify-content:center;align-items:center;gap:2rem;background:var(--sur);border-radius:14px;border:1px solid var(--bd);padding:1rem 2rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.stat-item{text-align:center}
+.stat-n{font-size:28px;font-weight:700}
+.stat-l{font-size:11px;color:var(--tx3);margin-top:1px}
+.stat-div{width:1px;height:38px;background:var(--bdS)}
+
+/* GRID */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+
+/* CARD */
+.card{background:var(--sur);border-radius:14px;border:1px solid var(--bd);overflow:hidden}
+.card-bar{height:4px}
+.card-head{padding:15px 18px 11px}
+.g-label{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
+.g-num{font-size:42px;font-weight:700;line-height:1;color:var(--tx)}
+.g-meta{font-size:11.5px;color:var(--tx3);margin-top:3px}
+.card-sep{height:1px;background:var(--bd);margin:0 18px}
+.card-body{padding:10px 18px 15px}
+
+/* ENDPOINT ROW */
+.ep{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd)}
+.ep:last-child{border-bottom:none}
+.ep-info{flex:1;min-width:0}
+.ep-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px}
+.ep-name{font-size:12.5px;font-weight:600;color:var(--tx)}
+.method{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:3px;letter-spacing:.04em;flex-shrink:0}
+.GET{background:#e8f5e9;color:#2e7d32}
+.POST{background:#fff3e0;color:#e65100}
+.ep-path{font-size:10.5px;color:var(--tx3);font-family:'Courier New',monospace;word-break:break-all}
+.tc-cases{margin-top:6px}
+.tc-title{font-size:10px;color:var(--tx3);margin-bottom:3px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.tc-list{list-style:none;padding:0}
+.tc-list li{font-size:10.5px;color:var(--tx2);padding:1.5px 0;display:flex;align-items:flex-start;gap:5px;line-height:1.4}
+.tc-list li::before{content:'›';flex-shrink:0;color:var(--tx3)}
+.badge{font-size:12px;font-weight:700;padding:3px 11px;border-radius:20px;flex-shrink:0;white-space:nowrap}
+
+/* group colors */
+.g1 .card-bar{background:var(--c1a)} .g1 .g-label{color:var(--c1)} .g1 .badge{background:var(--c1b);color:var(--c1d)}
+.g2 .card-bar{background:var(--c2a)} .g2 .g-label{color:var(--c2)} .g2 .badge{background:var(--c2b);color:var(--c2d)}
+.g3 .card-bar{background:var(--c3a)} .g3 .g-label{color:var(--c3)} .g3 .badge{background:var(--c3b);color:var(--c3d)}
+.g4 .card-bar{background:var(--c4a)} .g4 .g-label{color:var(--c4)} .g4 .badge{background:var(--c4b);color:var(--c4d)}
+.g5 .card-bar{background:var(--c5a)} .g5 .g-label{color:var(--c5)} .g5 .badge{background:var(--c5b);color:var(--c5d)}
+
+/* DIST BAR */
+.dist-wrap{background:var(--sur);border-radius:14px;border:1px solid var(--bd);padding:1.25rem 1.5rem;margin-top:1.25rem}
+.dist-title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;text-align:center;margin-bottom:.75rem}
+.dist-bar{display:flex;height:26px;border-radius:8px;overflow:hidden;gap:2px;margin-bottom:.9rem}
+.dseg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.dist-labels{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.dl{text-align:center}
+.dl-dot{width:10px;height:10px;border-radius:3px;margin:0 auto 3px}
+.dl-name{font-size:10.5px;color:var(--tx2)}
+.dl-n{font-size:13px;font-weight:700;color:var(--tx)}
+
+/* EXCLUDED */
+.excl{background:var(--sur);border-radius:14px;border:1px solid var(--bd);padding:1rem 1.5rem;margin-top:1rem;display:flex;gap:12px;align-items:flex-start}
+.excl-body .excl-title{font-size:13px;font-weight:600;color:var(--tx2);margin-bottom:6px}
+.tag{display:inline-block;background:var(--sur2);border:1px solid var(--bdS);border-radius:4px;padding:1px 7px;font-size:10.5px;color:var(--tx2);margin:2px 3px;font-family:'Courier New',monospace}
+
+/* TOGGLE */
+.tc-toggle{display:none}
+.tc-toggle:checked ~ .tc-cases{display:block}
+.tc-label{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--tx3);cursor:pointer;margin-top:4px;user-select:none;border:1px solid var(--bd);border-radius:4px;padding:1px 7px}
+.tc-label:hover{background:var(--sur2)}
+.tc-cases{display:none;margin-top:5px;padding:7px 10px;background:var(--sur2);border-radius:6px}
+
+.foot{text-align:center;font-size:11px;color:var(--tx3);margin-top:1.5rem}
+
+@media(max-width:680px){
+  .grid3,.grid2{grid-template-columns:1fr}
+  .stats{gap:1rem}
+  .stat-div{width:60px;height:1px}
+}
+@media print{
+  .tc-cases{display:block!important}
+  .tc-label{display:none}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="eye">ParaBank REST API · Graduation Project · Software Testing</div>
+  <h1>توزيع الـ API Test Cases على 5 أعضاء</h1>
+  <span class="url">https://parabank.parasoft.com/parabank/services/bank</span>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat-item"><div class="stat-n">91</div><div class="stat-l">إجمالي Test Cases</div></div>
+  <div class="stat-div"></div>
+  <div class="stat-item"><div class="stat-n">5</div><div class="stat-l">أعضاء التيم</div></div>
+  <div class="stat-div"></div>
+  <div class="stat-item"><div class="stat-n">16</div><div class="stat-l">Endpoints في النطاق</div></div>
+  <div class="stat-div"></div>
+  <div class="stat-item"><div class="stat-n">≤ 2</div><div class="stat-l">فرق بين الـ Groups</div></div>
+</div>
+
+<!-- ROW 1: 3 CARDS -->
+<div class="grid3">
+
+<!-- G1 -->
+<div class="card g1">
+  <div class="card-bar"></div>
+  <div class="card-head">
+    <div class="g-label">Group 1 — Auth &amp; Customer</div>
+    <div class="g-num">18</div>
+    <div class="g-meta">test cases · 2 endpoints</div>
+  </div>
+  <div class="card-sep"></div>
+  <div class="card-body">
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Login</span><span class="method GET">GET</span></div>
+        <div class="ep-path">/login/{username}/{password}</div>
+        <input type="checkbox" class="tc-toggle" id="t1a">
+        <label class="tc-label" for="t1a">▸ الـ Test Cases (9)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Login بـ credentials صح → 200 + customer object</li>
+            <li>Password غلط → error response</li>
+            <li>Username غلط → error response</li>
+            <li>Username فاضي → validation error</li>
+            <li>Password فاضي → validation error</li>
+            <li>الاتنين فاضيين → validation error</li>
+            <li>Username بـ special characters</li>
+            <li>Password بـ spaces</li>
+            <li>Username بـ حروف كبيرة (case sensitivity)</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">9</span>
+    </div>
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Update customer info</span><span class="method POST">POST</span></div>
+        <div class="ep-path">/customers/update/{customerId}</div>
+        <input type="checkbox" class="tc-toggle" id="t1b">
+        <label class="tc-label" for="t1b">▸ الـ Test Cases (9)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Update كل الـ fields بداتا صح → 200</li>
+            <li>Update firstName فقط</li>
+            <li>Update address فقط</li>
+            <li>customerId مش موجود → error</li>
+            <li>customerId = string بدل number → error</li>
+            <li>firstName فاضي → validation error</li>
+            <li>lastName فاضي → validation error</li>
+            <li>phoneNumber format غلط</li>
+            <li>SSN format غلط</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">9</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- G2 -->
+<div class="card g2">
+  <div class="card-bar"></div>
+  <div class="card-head">
+    <div class="g-label">Group 2 — Customer &amp; Accounts</div>
+    <div class="g-num">19</div>
+    <div class="g-meta">test cases · 3 endpoints</div>
+  </div>
+  <div class="card-sep"></div>
+  <div class="card-body">
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Get customer details</span><span class="method GET">GET</span></div>
+        <div class="ep-path">/customers/{customerId}</div>
+        <input type="checkbox" class="tc-toggle" id="t2a">
+        <label class="tc-label" for="t2a">▸ الـ Test Cases (7)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Valid customerId → 200 + customer data</li>
+            <li>التحقق من الـ response fields (id, firstName, lastName, address)</li>
+            <li>customerId مش موجود → error</li>
+            <li>customerId = 0 → error</li>
+            <li>customerId سالب → error</li>
+            <li>customerId = string → error</li>
+            <li>Response content-type = JSON</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">7</span>
+    </div>
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Get account by ID</span><span class="method GET">GET</span></div>
+        <div class="ep-path">/accounts/{accountId}</div>
+        <input type="checkbox" class="tc-toggle" id="t2b">
+        <label class="tc-label" for="t2b">▸ الـ Test Cases (6)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Valid accountId → 200 + account object</li>
+            <li>التحقق من الـ fields (id, customerId, type, balance)</li>
+            <li>accountId مش موجود → error</li>
+            <li>accountId سالب → error</li>
+            <li>accountId = string → error</li>
+            <li>Account type = CHECKING أو SAVINGS</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">6</span>
+    </div>
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Get customer accounts</span><span class="method GET">GET</span></div>
+        <div class="ep-path">/customers/{customerId}/accounts</div>
+        <input type="checkbox" class="tc-toggle" id="t2c">
+        <label class="tc-label" for="t2c">▸ الـ Test Cases (6)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Valid customerId → list of accounts</li>
+            <li>Response = array مش object</li>
+            <li>كل account فيه الـ fields المطلوبة</li>
+            <li>customerId مش موجود → error</li>
+            <li>customerId = string → error</li>
+            <li>Customer بدون accounts → empty list</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">6</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- G3 -->
+<div class="card g3">
+  <div class="card-bar"></div>
+  <div class="card-head">
+    <div class="g-label">Group 3 — Transactions</div>
+    <div class="g-num">19</div>
+    <div class="g-meta">test cases · 6 endpoints</div>
+  </div>
+  <div class="card-sep"></div>
+  <div class="card-body">
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Get account transactions</span><span class="method GET">GET</span></div>
+        <div class="ep-path">/accounts/{accountId}/transactions</div>
+        <input type="checkbox" class="tc-toggle" id="t3a">
+        <label class="tc-label" for="t3a">▸ الـ Test Cases (5)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Valid accountId → list of transactions</li>
+            <li>Response = array + كل transaction فيه fields صح</li>
+            <li>Account بدون transactions → empty list</li>
+            <li>Invalid accountId → error</li>
+            <li>accountId مش موجود → error</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">5</span>
+    </div>
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Get transaction by ID</span><span class="method GET">GET</span></div>
+        <div class="ep-path">/transactions/{transactionId}</div>
+        <input type="checkbox" class="tc-toggle" id="t3b">
+        <label class="tc-label" for="t3b">▸ الـ Test Cases (4)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Valid transactionId → transaction object</li>
+            <li>التحقق من الـ fields (id, accountId, type, date, amount, description)</li>
+            <li>transactionId مش موجود → error</li>
+            <li>transactionId = string → error</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">4</span>
+    </div>
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Transactions by amount</span><span class="method GET">GET</span></div>
+        <div class="ep-path">/accounts/{accountId}/transactions/amount/{amount}</div>
+        <input type="checkbox" class="tc-toggle" id="t3c">
+        <label class="tc-label" for="t3c">▸ الـ Test Cases (3)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Valid amount موجود → filtered list</li>
+            <li>Amount مش موجود في الـ transactions → empty list</li>
+            <li>Amount = string → error</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">3</span>
+    </div>
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Transactions by month &amp; type</span><span class="method GET">GET</span></div>
+        <div class="ep-path">/accounts/{accountId}/transactions/month/{month}/type/{type}</div>
+        <input type="checkbox" class="tc-toggle" id="t3d">
+        <label class="tc-label" for="t3d">▸ الـ Test Cases (3)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Valid month + type → filtered list</li>
+            <li>Month مش موجود في الـ transactions → empty list</li>
+            <li>Type غلط (مش Debit/Credit) → error أو empty</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">3</span>
+    </div>
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Transactions by date range</span><span class="method GET">GET</span></div>
+        <div class="ep-path">/accounts/{accountId}/transactions/fromDate/{from}/toDate/{to}</div>
+        <input type="checkbox" class="tc-toggle" id="t3e">
+        <label class="tc-label" for="t3e">▸ الـ Test Cases (2)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Valid date range → filtered transactions</li>
+            <li>fromDate بعد toDate → error أو empty</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">2</span>
+    </div>
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Transactions on date</span><span class="method GET">GET</span></div>
+        <div class="ep-path">/accounts/{accountId}/transactions/onDate/{onDate}</div>
+        <input type="checkbox" class="tc-toggle" id="t3f">
+        <label class="tc-label" for="t3f">▸ الـ Test Cases (2)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Valid date → list of transactions في اليوم ده</li>
+            <li>Date format غلط → error</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">2</span>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- end grid3 -->
+
+<!-- ROW 2: 2 CARDS -->
+<div class="grid2">
+
+<!-- G4 -->
+<div class="card g4">
+  <div class="card-bar"></div>
+  <div class="card-head">
+    <div class="g-label">Group 4 — Funds Operations</div>
+    <div class="g-num">18</div>
+    <div class="g-meta">test cases · 3 endpoints</div>
+  </div>
+  <div class="card-sep"></div>
+  <div class="card-body">
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Transfer funds</span><span class="method POST">POST</span></div>
+        <div class="ep-path">/transfer?fromAccountId=&amp;toAccountId=&amp;amount=</div>
+        <input type="checkbox" class="tc-toggle" id="t4a">
+        <label class="tc-label" for="t4a">▸ الـ Test Cases (7)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Transfer ناجح → 200 + balance اتحدث</li>
+            <li>Insufficient funds → error</li>
+            <li>fromAccount = toAccount → error</li>
+            <li>fromAccountId مش موجود → error</li>
+            <li>toAccountId مش موجود → error</li>
+            <li>Amount = 0 → error</li>
+            <li>Amount سالب → error</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">7</span>
+    </div>
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Deposit funds</span><span class="method POST">POST</span></div>
+        <div class="ep-path">/deposit?accountId=&amp;amount=</div>
+        <input type="checkbox" class="tc-toggle" id="t4b">
+        <label class="tc-label" for="t4b">▸ الـ Test Cases (5)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Deposit ناجح → balance زاد بالصح</li>
+            <li>accountId مش موجود → error</li>
+            <li>Amount = 0 → error</li>
+            <li>Amount سالب → error</li>
+            <li>Amount = string → error</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">5</span>
+    </div>
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Withdraw funds</span><span class="method POST">POST</span></div>
+        <div class="ep-path">/withdraw?accountId=&amp;amount=</div>
+        <input type="checkbox" class="tc-toggle" id="t4c">
+        <label class="tc-label" for="t4c">▸ الـ Test Cases (6)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Withdraw ناجح → balance نقص بالصح</li>
+            <li>Insufficient balance → error</li>
+            <li>accountId مش موجود → error</li>
+            <li>Amount = 0 → error</li>
+            <li>Amount سالب → error</li>
+            <li>Amount أكبر من الـ balance → error</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">6</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- G5 -->
+<div class="card g5">
+  <div class="card-bar"></div>
+  <div class="card-head">
+    <div class="g-label">Group 5 — Account, Bill Pay &amp; Loan</div>
+    <div class="g-num">17</div>
+    <div class="g-meta">test cases · 3 endpoints</div>
+  </div>
+  <div class="card-sep"></div>
+  <div class="card-body">
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Create account</span><span class="method POST">POST</span></div>
+        <div class="ep-path">/createAccount?customerId=&amp;newAccountType=&amp;fromAccountId=</div>
+        <input type="checkbox" class="tc-toggle" id="t5a">
+        <label class="tc-label" for="t5a">▸ الـ Test Cases (6)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Create CHECKING account (type=0) → 200 + account created</li>
+            <li>Create SAVINGS account (type=1) → 200 + account created</li>
+            <li>customerId مش موجود → error</li>
+            <li>fromAccountId مش موجود → error</li>
+            <li>newAccountType قيمة غلط → error</li>
+            <li>Insufficient balance في الـ fromAccount → error</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">6</span>
+    </div>
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Bill payment</span><span class="method POST">POST</span></div>
+        <div class="ep-path">/billpay?accountId=&amp;amount=</div>
+        <input type="checkbox" class="tc-toggle" id="t5b">
+        <label class="tc-label" for="t5b">▸ الـ Test Cases (6)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Bill pay ناجح → 200 + transaction created</li>
+            <li>accountId مش موجود → error</li>
+            <li>Amount = 0 → error</li>
+            <li>Amount سالب → error</li>
+            <li>Payee name فاضي → validation error</li>
+            <li>Insufficient funds → error</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">6</span>
+    </div>
+
+    <div class="ep">
+      <div class="ep-info">
+        <div class="ep-top"><span class="ep-name">Request loan</span><span class="method POST">POST</span></div>
+        <div class="ep-path">/requestLoan?customerId=&amp;amount=&amp;downPayment=&amp;fromAccountId=</div>
+        <input type="checkbox" class="tc-toggle" id="t5c">
+        <label class="tc-label" for="t5c">▸ الـ Test Cases (5)</label>
+        <div class="tc-cases">
+          <ul class="tc-list">
+            <li>Loan request ناجح → approved = true + loan account created</li>
+            <li>Down payment أكبر من الـ balance → declined أو error</li>
+            <li>Amount = 0 → error</li>
+            <li>customerId مش موجود → error</li>
+            <li>fromAccountId مش موجود → error</li>
+          </ul>
+        </div>
+      </div>
+      <span class="badge">5</span>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- end grid2 -->
+
+<!-- DIST BAR -->
+<div class="dist-wrap">
+  <div class="dist-title">توزيع الـ 91 Test Case على الـ 5 Groups</div>
+  <div class="dist-bar">
+    <div class="dseg" style="flex:18;background:var(--c1a)">18</div>
+    <div class="dseg" style="flex:19;background:var(--c2a)">19</div>
+    <div class="dseg" style="flex:19;background:var(--c3a)">19</div>
+    <div class="dseg" style="flex:18;background:var(--c4a)">18</div>
+    <div class="dseg" style="flex:17;background:var(--c5a)">17</div>
+  </div>
+  <div class="dist-labels">
+    <div class="dl"><div class="dl-dot" style="background:var(--c1a)"></div><div class="dl-name">Auth &amp; Customer</div><div class="dl-n">18 TCs</div></div>
+    <div class="dl"><div class="dl-dot" style="background:var(--c2a)"></div><div class="dl-name">Customer &amp; Accounts</div><div class="dl-n">19 TCs</div></div>
+    <div class="dl"><div class="dl-dot" style="background:var(--c3a)"></div><div class="dl-name">Transactions</div><div class="dl-n">19 TCs</div></div>
+    <div class="dl"><div class="dl-dot" style="background:var(--c4a)"></div><div class="dl-name">Funds Operations</div><div class="dl-n">18 TCs</div></div>
+    <div class="dl"><div class="dl-dot" style="background:var(--c5a)"></div><div class="dl-name">Bill Pay &amp; Loan</div><div class="dl-n">17 TCs</div></div>
+  </div>
+</div>
+
+<!-- EXCLUDED -->
+<div class="excl">
+  <div style="font-size:18px;flex-shrink:0">⚠️</div>
+  <div class="excl-body">
+    <div class="excl-title">Endpoints خارج النطاق — مش في scope المشروع</div>
+    <div>
+      <span class="tag">POST /cleanDB</span>
+      <span class="tag">POST /initializeDB</span>
+      <span class="tag">POST /setParameter/{name}/{value}</span>
+      <span class="tag">POST /startupJmsListener</span>
+      <span class="tag">POST /shutdownJmsListener</span>
+      <span class="tag">POST /customers/{id}/buyPosition</span>
+      <span class="tag">POST /customers/{id}/sellPosition</span>
+      <span class="tag">GET /positions/{positionId}</span>
+      <span class="tag">GET /positions/{positionId}/{start}/{end}</span>
+      <span class="tag">GET /customers/{id}/positions</span>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  ParaBank REST API v3.0 · Base URL: /parabank/services/bank · Graduation Project — Software Testing
+</div>
+
+</div>
+</body>
+</html>
