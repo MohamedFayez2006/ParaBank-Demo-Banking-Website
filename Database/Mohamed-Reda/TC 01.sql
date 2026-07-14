@@ -1,0 +1,2 @@
+DESCRIBE products;
+DESCRIBE categories;
